@@ -1,24 +1,31 @@
 import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
+
+import { verify } from 'jsonwebtoken'
+import { createLogger } from '../../utils/logger'
+import { JwtToken } from '../../auth/JwtToken'
+
 import * as middy from 'middy'
 import { secretsManager } from 'middy/middlewares'
 
-import { verify } from 'jsonwebtoken'
-import { JwtToken } from '../../auth/JwtToken'
+const logger = createLogger('auth')
 
 const secretId = process.env.AUTH_0_SECRET_ID
 const secretField = process.env.AUTH_0_SECRET_FIELD
 
-export const handler = middy(async (event: CustomAuthorizerEvent, context): Promise<CustomAuthorizerResult> => {
+
+export const handler = middy(async (
+  event: CustomAuthorizerEvent,
+  context
+): Promise<CustomAuthorizerResult> => {
+  logger.info('Authorizing a user', event.authorizationToken)
+  console.log('Authorizing a user', event.authorizationToken)
   try {
-    const decodedToken = verifyToken(
-      event.authorizationToken,
-      context.AUTH0_SECRET[secretField]
-    )
-    console.log('User was authorized', decodedToken)
+    const jwtToken = verifyToken(event.authorizationToken, context.AUTH0_SECRET[secretField])
+    logger.info('User was authorized', jwtToken)
 
     return {
-      principalId: decodedToken.sub,
+      principalId: jwtToken.sub,
       policyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -31,7 +38,7 @@ export const handler = middy(async (event: CustomAuthorizerEvent, context): Prom
       }
     }
   } catch (e) {
-    console.log('User was not authorized', e.message)
+    logger.error('User not authorized', { error: e.message })
 
     return {
       principalId: 'user',
@@ -52,7 +59,6 @@ export const handler = middy(async (event: CustomAuthorizerEvent, context): Prom
 function verifyToken(authHeader: string, secret: string): JwtToken {
   const token = getToken(authHeader)
   console.log('token: ', token)
-  //## TODO: Implement token verification
   return verify(token, secret) as JwtToken
 }
 
