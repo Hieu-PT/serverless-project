@@ -50,8 +50,14 @@ export const handler = middy(async (event: CustomAuthorizerEvent, context): Prom
 })
 
 function verifyToken(authHeader: string, secret: string): JwtToken {
-  if (!authHeader)
-    throw new Error('No authentication header')
+  const token = getToken(authHeader)
+  console.log('token: ', token)
+  //## TODO: Implement token verification
+  return verify(token, secret) as JwtToken
+}
+
+function getToken(authHeader: string): string {
+  if (!authHeader) throw new Error('No authentication header')
 
   if (!authHeader.toLowerCase().startsWith('bearer '))
     throw new Error('Invalid authentication header')
@@ -59,7 +65,7 @@ function verifyToken(authHeader: string, secret: string): JwtToken {
   const split = authHeader.split(' ')
   const token = split[1]
 
-  return verify(token, secret) as JwtToken
+  return token
 }
 
 handler.use(
