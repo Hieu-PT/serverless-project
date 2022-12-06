@@ -15,14 +15,15 @@
     "winston": "^3.7.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.95",
+    "@types/aws-lambda": "^8.10.28",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^10.17.60",
-    "aws-sdk": "^2.1126.0",
+    "aws-sdk": "^2.1268.0",
     "serverless-aws-documentation": "^1.1.0",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-iam-roles-per-function": "^3.2.0",
     "serverless-plugin-canary-deployments": "^0.4.8",
+    "serverless-plugin-tracing": "^2.0.0",
     "serverless-reqvalidator-plugin": "^1.0.4",
     "serverless-webpack": "^5.7.0",
     "ts-loader": "^5.4.5",
